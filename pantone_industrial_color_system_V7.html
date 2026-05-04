@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pantone工业颜色系统</title>
+<style>
+  :root {
+    --bg: #0e1117;
+    --panel: #151a23;
+    --panel-2: #1c2330;
+    --panel-3: #222b3a;
+    --line: rgba(255,255,255,0.08);
+    --line-strong: rgba(255,255,255,0.16);
+    --text: #eef3fb;
+    --muted: #96a3b8;
+    --accent: #72a7ff;
+    --accent-2: #b5d3ff;
+    --success: #6ad8a1;
+    --warning: #ffc36b;
+    --danger: #ff8f8f;
+    --shadow: 0 16px 40px rgba(0,0,0,.28);
+    --radius-xl: 22px;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --left-width: 360px;
+    --right-width: 360px;
+    --header-h: 72px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: Inter, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(114,167,255,.12), transparent 22%),
+      radial-gradient(circle at bottom right, rgba(255,171,100,.10), transparent 24%),
+      linear-gradient(180deg, #0c1016 0%, #101520 100%);
+    color: var(--text);
+    overflow-y: auto;
+  }
+
+  .app-shell {
+    min-height: 100vh;
+    padding: 16px;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: var(--header-h);
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 18px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    background: rgba(14,17,23,.78);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+
+  .title-wrap h1 {
+    margin: 0;
+    font-size: 22px;
+    letter-spacing: .2px;
+  }
+  .title-wrap p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .pill-row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pill {
+    padding: 10px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: rgba(255,255,255,.03);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .pill strong { color: var(--text); font-weight: 700; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(300px, var(--left-width)) minmax(560px, 1fr) minmax(300px, var(--right-width));
+    gap: 16px;
+    align-items: start;
+  }
+
+  .panel {
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .panel-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.01));
+  }
+  .panel-header h2 {
+    font-size: 16px;
+    margin: 0;
+  }
+  .panel-header p {
+    color: var(--muted);
+    margin: 6px 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .left-panel, .right-panel {
+    position: sticky;
+    top: calc(var(--header-h) + 20px);
+    max-height: calc(100vh - var(--header-h) - 36px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scroll-region {
+    overflow: auto;
+    padding: 16px;
+  }
+
+  .center-panel {
+    min-height: calc(100vh - var(--header-h) - 24px);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cup-stage {
+    position: sticky;
+    top: calc(var(--header-h) + 20px);
+    padding: 18px;
+  }
+
+  .stage-card {
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at top, rgba(255,255,255,.08), transparent 42%),
+      linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+    padding: 18px;
+    min-height: calc(100vh - var(--header-h) - 58px);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    gap: 16px;
+  }
+
+  .stage-topbar, .stage-bottombar {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .part-switcher {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .part-btn, .ghost-btn, .mode-btn, .material-btn, .chip-btn, .light-btn {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.04);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: .2s ease;
+    font-size: 12px;
+  }
+  .part-btn:hover, .ghost-btn:hover, .mode-btn:hover, .material-btn:hover, .chip-btn:hover, .light-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255,255,255,.18);
+    background: rgba(255,255,255,.07);
+  }
+  .part-btn.active, .mode-btn.active, .material-btn.active, .chip-btn.active, .light-btn.active {
+    background: linear-gradient(180deg, rgba(114,167,255,.30), rgba(114,167,255,.16));
+    border-color: rgba(114,167,255,.62);
+    color: white;
+    box-shadow: 0 0 0 1px rgba(114,167,255,.2) inset;
+  }
+
+  .viewer-wrap {
+    min-height: 0;
+    display: grid;
+    place-items: center;
+    padding: 10px 10px 22px;
+  }
+
+  .viewer-frame {
+    width: min(100%, 920px);
+    height: min(66vh, 820px);
+    min-height: 500px;
+    display: grid;
+    place-items: center;
+    position: relative;
+    overflow: visible;
+  }
+
+  svg#cupSvg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 32px 44px rgba(0,0,0,.25));
+  }
+
+  .cup-part {
+    cursor: pointer;
+    transition: filter .18s ease, transform .18s ease, stroke .18s ease, stroke-width .18s ease;
+  }
+  .cup-part:hover {
+    filter: brightness(1.06) saturate(1.06);
+  }
+  .cup-part.selected {
+    stroke: #ffffff;
+    stroke-width: 4px;
+    filter: drop-shadow(0 0 12px rgba(255,255,255,.3)) brightness(1.08);
+  }
+
+  .part-label {
+    fill: rgba(255,255,255,.72);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .legend-note {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .search-row, .lab-grid, .param-grid, .json-box, .scheme-list, .top3-list, .section-stack {
+    display: grid;
+    gap: 12px;
+  }
+
+  .search-row input, .lab-grid input, .json-box textarea, .export-box textarea {
+    width: 100%;
+    background: #0f1420;
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 11px 12px;
+    outline: none;
+    font-size: 13px;
+  }
+  .search-row input:focus, .lab-grid input:focus, .json-box textarea:focus, .export-box textarea:focus {
+    border-color: rgba(114,167,255,.65);
+    box-shadow: 0 0 0 3px rgba(114,167,255,.12);
+  }
+
+  .toolbar-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .color-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255,255,255,.03);
+    overflow: hidden;
+    cursor: pointer;
+    transition: .18s ease;
+  }
+  .color-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,.18);
+    box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  }
+  .color-card.selected {
+    border-color: rgba(114,167,255,.7);
+    box-shadow: 0 0 0 1px rgba(114,167,255,.24) inset, 0 12px 24px rgba(0,0,0,.18);
+  }
+  .color-card .swatch {
+    height: 66px;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+  }
+  .color-card .meta {
+    padding: 10px 12px 12px;
+  }
+  .color-card .name {
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .color-card .sub {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .spectrum-view {
+    display: none;
+    margin-top: 14px;
+    gap: 10px;
+  }
+  .spectrum-strip {
+    height: 48px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    cursor: pointer;
+  }
+  .spectrum-strip canvas { width: 100%; height: 100%; display: block; }
+
+  .gradient-board {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+  .gradient-swatch {
+    border-radius: 12px;
+    height: 64px;
+    border: 1px solid rgba(255,255,255,.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .gradient-swatch span {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    font-size: 10px;
+    background: rgba(0,0,0,.26);
+    padding: 3px 6px;
+    border-radius: 999px;
+  }
+
+  .material-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .material-btn {
+    padding: 12px;
+    min-height: 54px;
+    text-align: left;
+  }
+  .material-btn small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+  }
+
+  .section {
+    padding: 16px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.02);
+    border-radius: 18px;
+  }
+  .section h3 {
+    font-size: 14px;
+    margin: 0 0 10px;
+  }
+  .section .desc {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .lab-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .lab-grid .field {
+    display: grid;
+    gap: 6px;
+  }
+  .field label, .mini-label {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .result-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,.03);
+  }
+  .result-card strong { font-size: 14px; }
+  .result-card .score {
+    margin-top: 4px;
+    color: var(--success);
+    font-size: 12px;
+  }
+  .result-card .delta {
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .top3-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.02);
+  }
+  .dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.12);
+    flex: 0 0 auto;
+  }
+  .top3-meta {
+    min-width: 0;
+    display: grid;
+    gap: 2px;
+  }
+  .top3-meta .line1 { font-size: 12px; font-weight: 700; }
+  .top3-meta .line2 { font-size: 11px; color: var(--muted); }
+
+  .params-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .param-card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    background: rgba(255,255,255,.03);
+  }
+  .param-card .k { color: var(--muted); font-size: 11px; margin-bottom: 6px; }
+  .param-card .v {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .scheme-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.02);
+    font-size: 12px;
+  }
+  .scheme-item .left { color: var(--muted); }
+  .scheme-item .right { text-align: right; }
+
+  .export-box textarea {
+    min-height: 180px;
+    resize: vertical;
+  }
+  .copy-line {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+
+  .btn-primary, .btn-secondary {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 12px;
+    padding: 11px 14px;
+    font-size: 12px;
+    transition: .2s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, #82b5ff, #5d8cff);
+    color: white;
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,.08);
+    color: var(--text);
+    border: 1px solid var(--line);
+  }
+  .btn-primary:hover, .btn-secondary:hover { transform: translateY(-1px); }
+
+  .toast {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 50;
+    padding: 12px 16px;
+    background: rgba(14,17,23,.92);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 14px;
+    transform: translateY(16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: .22s ease;
+    box-shadow: var(--shadow);
+    max-width: 320px;
+    font-size: 13px;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .split-compare {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .mini-material {
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(255,255,255,.03);
+  }
+  .mini-material canvas {
+    width: 100%;
+    height: 44px;
+    display: block;
+    border-radius: 8px;
+    margin-top: 6px;
+  }
+
+  .footer-note {
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1320px) {
+    :root { --left-width: 320px; --right-width: 320px; }
+    .layout { grid-template-columns: 320px minmax(460px, 1fr) 320px; }
+  }
+
+  @media (max-width: 1120px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .left-panel, .right-panel, .cup-stage {
+      position: relative;
+      top: auto;
+      max-height: none;
+    }
+    .left-panel .scroll-region, .right-panel .scroll-region {
+      max-height: none;
+      overflow: visible;
+    }
+    .stage-card {
+      min-height: auto;
+    }
+    .viewer-frame {
+      min-height: 460px;
+      height: 62vh;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="title-wrap">
+      <h1>Pantone 工业颜色系统</h1>
+      <p>多部件独立配色 × 材质统一渲染 × LAB / RGB 参数联动</p>
+    </div>
+    <div class="pill-row">
+      <div class="pill">当前材质：<strong id="currentMaterialLabel">Metal</strong></div>
+      <div class="pill">正在编辑：<strong id="currentPartLabelTop">杯身 Body</strong></div>
+      <div class="pill">当前颜色：<strong id="currentPantoneLabelTop">Pantone 186 C</strong></div>
+    </div>
+    <div class="pill-row">
+      <button class="light-btn active" data-light="cool">冷光</button>
+      <button class="light-btn" data-light="warm">暖光</button>
+      <button class="btn-secondary" id="resetSchemeBtn">重置方案</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="panel left-panel">
+      <div class="panel-header">
+        <h2>Pantone 颜色库</h2>
+        <p>支持搜索、分类筛选、GRID / SPECTRUM 视图。点击颜色仅作用于当前选中部件。</p>
+      </div>
+      <div class="scroll-region">
+        <div class="search-row">
+          <input id="searchInput" type="text" placeholder="搜索 Pantone 编号 / 名称 / 分类" />
+          <div class="toolbar-row" id="categoryBar"></div>
+          <div class="toolbar-row">
+            <button class="mode-btn active" data-view="grid">GRID</button>
+            <button class="mode-btn" data-view="spectrum">SPECTRUM</button>
+          </div>
+        </div>
+        <div class="palette-grid" id="paletteGrid"></div>
+        <div class="spectrum-view" id="spectrumView"></div>
+      </div>
+    </aside>
+
+    <main class="panel center-panel">
+      <div class="cup-stage">
+        <div class="stage-card">
+          <div class="stage-topbar">
+            <div>
+              <div style="font-size:18px;font-weight:800;">Quencher 系列工业配色预览</div>
+              <div class="legend-note">默认缩小 15%，中间区域固定显示，杯体完整不裁切。点击部件进入编辑状态。</div>
+            </div>
+            <div class="part-switcher" id="partSwitcher"></div>
+          </div>
+
+          <div class="viewer-wrap">
+            <div class="viewer-frame">
+              <svg id="cupSvg" viewBox="0 0 820 840" aria-label="Stanley Quencher cup model" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                  <filter id="shadowSoft" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="rgba(0,0,0,.25)"/>
+                  </filter>
+                  <linearGradient id="cupAmbient" x1="0" x2="1" y1="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(255,255,255,.28)" />
+                    <stop offset="25%" stop-color="rgba(255,255,255,.06)" />
+                    <stop offset="70%" stop-color="rgba(0,0,0,.08)" />
+                    <stop offset="100%" stop-color="rgba(255,255,255,.12)" />
+                  </linearGradient>
+                  <linearGradient id="edgeSpecular" x1="0" x2="1">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.00)" />
+                    <stop offset="20%" stop-color="rgba(255,255,255,0.12)" />
+                    <stop offset="42%" stop-color="rgba(255,255,255,0.32)" />
+                    <stop offset="68%" stop-color="rgba(0,0,0,0.08)" />
+                    <stop offset="100%" stop-color="rgba(255,255,255,0.00)" />
+                  </linearGradient>
+                  <pattern id="pattern_body" patternUnits="userSpaceOnUse" width="120" height="120"></pattern>
+                  <pattern id="pattern_lid" patternUnits="userSpaceOnUse" width="120" height="120"></pattern>
+                  <pattern id="pattern_base" patternUnits="userSpaceOnUse" width="120" height="120"></pattern>
+                  <pattern id="pattern_handle" patternUnits="userSpaceOnUse" width="120" height="120"></pattern>
+                  <pattern id="pattern_straw" patternUnits="userSpaceOnUse" width="120" height="120"></pattern>
+                </defs>
+
+                <ellipse cx="410" cy="760" rx="168" ry="38" fill="rgba(0,0,0,.18)" />
+
+                <g transform="translate(0,-14) scale(0.85) translate(60,66)" filter="url(#shadowSoft)">
+                  <path id="handle" class="cup-part" data-part="handle"
+                        d="M584 210 C690 210, 728 290, 728 400 C728 510, 685 598, 595 615 L571 572 C633 560, 668 500, 668 401 C668 300, 634 258, 574 258 Z"
+                        fill="url(#pattern_handle)" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+                  <path d="M596 257 C646 264, 668 307, 668 399 C668 492, 637 553, 580 571" fill="none" stroke="url(#edgeSpecular)" stroke-width="10" opacity=".65" />
+
+                  <path id="lid" class="cup-part" data-part="lid"
+                        d="M232 148 C280 120, 540 120, 586 148 L598 190 C550 172, 273 172, 220 190 Z"
+                        fill="url(#pattern_lid)" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+                  <path d="M246 154 C315 138, 500 138, 572 154" fill="none" stroke="url(#edgeSpecular)" stroke-width="11" opacity=".78" />
+
+                  <rect id="straw" class="cup-part" data-part="straw" x="457" y="52" width="30" height="176" rx="14"
+                        fill="url(#pattern_straw)" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+                  <rect x="462" y="60" width="8" height="160" rx="4" fill="rgba(255,255,255,.17)" opacity=".72" />
+
+                  <path id="body" class="cup-part" data-part="body"
+                        d="M235 188 L583 188 C567 356, 544 579, 505 698 C492 738, 323 738, 310 698 C274 585, 250 357, 235 188 Z"
+                        fill="url(#pattern_body)" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+                  <path d="M277 205 C286 329, 304 560, 331 688" fill="none" stroke="rgba(255,255,255,.17)" stroke-width="14" opacity=".7" />
+                  <path d="M535 208 C516 410, 495 603, 468 696" fill="none" stroke="rgba(0,0,0,.09)" stroke-width="16" opacity=".7" />
+                  <path d="M262 222 C346 194, 481 194, 557 220" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="10" opacity=".7" />
+
+                  <path id="base" class="cup-part" data-part="base"
+                        d="M292 686 C334 715, 485 715, 527 686 L543 744 C498 772, 325 772, 278 744 Z"
+                        fill="url(#pattern_base)" stroke="rgba(255,255,255,.1)" stroke-width="2"/>
+                  <path d="M304 695 C357 723, 458 723, 514 694" fill="none" stroke="url(#edgeSpecular)" stroke-width="10" opacity=".72" />
+
+                  <text class="part-label" x="386" y="427">Body</text>
+                  <text class="part-label" x="397" y="165">Lid</text>
+                  <text class="part-label" x="396" y="736">Base</text>
+                  <text class="part-label" x="668" y="427">Handle</text>
+                  <text class="part-label" x="496" y="100">Straw</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <div class="stage-bottombar">
+            <div class="pill-row">
+              <div class="pill">编辑部件：<strong id="currentPartLabelBottom">杯身 Body</strong></div>
+              <div class="pill">Pantone：<strong id="currentPantoneLabelBottom">Pantone 186 C</strong></div>
+            </div>
+            <div class="legend-note">规则：hover 仅预提示；selected 才会出现白色高亮描边并进入编辑状态。</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="panel right-panel">
+      <div class="panel-header">
+        <h2>参数 / 材质 / 匹配</h2>
+        <p>右侧独立滚动，包含材质切换、LAB→Pantone 匹配、参数复制、方案导出与对比。</p>
+      </div>
+      <div class="scroll-region section-stack">
+        <section class="section">
+          <h3>材质选择</h3>
+          <div class="desc">所有材质都作用于同一个 Quencher 产品模型，并通过 Canvas 纹理 + 光照模拟体现反射、粗糙度与纹理差异。</div>
+          <div class="material-grid" id="materialGrid"></div>
+        </section>
+
+        <section class="section">
+          <h3>LAB → Pantone 匹配</h3>
+          <div class="desc">输入 L / a / b，系统使用 ΔE(CIE76) 计算最接近 Pantone，并返回 Top 3 与相似度。</div>
+          <div class="lab-grid">
+            <div class="field"><label>L</label><input id="labL" type="number" step="0.1" placeholder="53.2" /></div>
+            <div class="field"><label>a</label><input id="labA" type="number" step="0.1" placeholder="71.1" /></div>
+            <div class="field"><label>b</label><input id="labB" type="number" step="0.1" placeholder="42.4" /></div>
+          </div>
+          <div class="copy-line">
+            <button class="btn-primary" id="matchBtn">执行匹配</button>
+            <button class="btn-secondary" id="fillCurrentLabBtn">填入当前颜色 LAB</button>
+          </div>
+          <div style="margin-top:12px" class="result-card" id="bestMatchBox">
+            <strong>等待输入</strong>
+            <div class="score">相似度：--</div>
+            <div class="delta">ΔE：--</div>
+          </div>
+          <div class="top3-list" id="top3List" style="margin-top:10px"></div>
+        </section>
+
+        <section class="section">
+          <h3>当前参数</h3>
+          <div class="params-row" id="paramsRow"></div>
+          <div class="copy-line">
+            <button class="btn-secondary" id="copyParamsBtn">复制参数</button>
+          </div>
+          <div style="margin-top:12px">
+            <div class="mini-label">5 阶渐变色板</div>
+            <div class="gradient-board" id="gradientBoard"></div>
+          </div>
+        </section>
+
+        <section class="section">
+          <h3>当前配色方案</h3>
+          <div class="scheme-list" id="schemeList"></div>
+          <div class="copy-line">
+            <button class="btn-primary" id="copySchemeBtn">一键复制方案</button>
+            <button class="btn-secondary" id="exportJsonBtn">JSON 导出</button>
+          </div>
+          <div class="export-box" style="margin-top:12px">
+            <textarea id="jsonOutput" readonly></textarea>
+          </div>
+        </section>
+
+        <section class="section">
+          <h3>材质对比模式</h3>
+          <div class="desc">加分项：快速对比当前颜色在不同材质下的局部表现。</div>
+          <div class="split-compare" id="splitCompare"></div>
+        </section>
+
+        <div class="footer-note">自检关注点：杯体完整显示；左右滚动区域独立；中间固定；材质纹理有明显差异；LAB 匹配非随机；导出 JSON 与当前方案一致。</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const pantoneData = [
+    { code: 'Pantone 186 C', category: 'Red', lab: [44.9, 67.3, 45.1], rgb: [200, 16, 46], hex: '#C8102E' },
+    { code: 'Pantone 485 C', category: 'Red', lab: [53.2, 71.1, 52.0], rgb: [218, 41, 28], hex: '#DA291C' },
+    { code: 'Pantone 1795 C', category: 'Red', lab: [49.4, 68.1, 46.6], rgb: [210, 38, 48], hex: '#D22630' },
+    { code: 'Pantone 7621 C', category: 'Red', lab: [35.3, 50.0, 31.7], rgb: [138, 21, 56], hex: '#8A1538' },
+    { code: 'Pantone 7625 C', category: 'Red', lab: [31.1, 41.4, 22.1], rgb: [123, 37, 63], hex: '#7B253F' },
+    { code: 'Pantone 7417 C', category: 'Red', lab: [46.2, 57.0, 36.1], rgb: [197, 58, 61], hex: '#C53A3D' },
+    { code: 'Pantone 1585 C', category: 'Orange', lab: [64.5, 43.2, 65.4], rgb: [255, 111, 0], hex: '#FF6F00' },
+    { code: 'Pantone 1655 C', category: 'Orange', lab: [57.5, 52.6, 65.7], rgb: [255, 103, 31], hex: '#FF671F' },
+    { code: 'Pantone 144 C', category: 'Orange', lab: [72.4, 24.1, 69.1], rgb: [237, 139, 0], hex: '#ED8B00' },
+    { code: 'Pantone 1235 C', category: 'Yellow', lab: [85.3, 8.9, 85.5], rgb: [255, 184, 28], hex: '#FFB81C' },
+    { code: 'Pantone 116 C', category: 'Yellow', lab: [90.0, -2.0, 88.0], rgb: [255, 205, 0], hex: '#FFCD00' },
+    { code: 'Pantone 7406 C', category: 'Yellow', lab: [79.1, 1.3, 76.0], rgb: [241, 196, 0], hex: '#F1C400' },
+    { code: 'Pantone 368 C', category: 'Green', lab: [68.5, -58.7, 60.4], rgb: [120, 190, 32], hex: '#78BE20' },
+    { code: 'Pantone 354 C', category: 'Green', lab: [56.7, -60.6, 45.8], rgb: [0, 175, 102], hex: '#00AF66' },
+    { code: 'Pantone 3405 C', category: 'Green', lab: [45.3, -36.8, 8.2], rgb: [0, 119, 90], hex: '#00775A' },
+    { code: 'Pantone 7724 C', category: 'Green', lab: [36.5, -31.9, 3.1], rgb: [0, 103, 92], hex: '#00675C' },
+    { code: 'Pantone 3258 C', category: 'Teal', lab: [72.2, -31.6, -2.7], rgb: [85, 221, 217], hex: '#55DDD9' },
+    { code: 'Pantone 3125 C', category: 'Blue', lab: [69.8, -19.7, -26.4], rgb: [0, 169, 224], hex: '#00A9E0' },
+    { code: 'Pantone 2995 C', category: 'Blue', lab: [67.4, -11.0, -41.5], rgb: [0, 169, 224], hex: '#00A9E0' },
+    { code: 'Pantone 3005 C', category: 'Blue', lab: [48.2, 4.9, -53.0], rgb: [0, 119, 200], hex: '#0077C8' },
+    { code: 'Pantone 286 C', category: 'Blue', lab: [32.0, 17.5, -61.9], rgb: [0, 56, 168], hex: '#0038A8' },
+    { code: 'Pantone 2758 C', category: 'Blue', lab: [18.1, 20.0, -45.0], rgb: [65, 39, 118], hex: '#412776' },
+    { code: 'Pantone 2728 C', category: 'Purple', lab: [41.2, 37.5, -67.2], rgb: [74, 48, 255], hex: '#4A30FF' },
+    { code: 'Pantone 2597 C', category: 'Purple', lab: [36.0, 59.0, -59.8], rgb: [88, 44, 131], hex: '#582C83' },
+    { code: 'Pantone 7665 C', category: 'Purple', lab: [58.0, 27.0, -31.1], rgb: [130, 78, 160], hex: '#824EA0' },
+    { code: 'Pantone 7424 C', category: 'Pink', lab: [66.9, 50.1, -7.0], rgb: [230, 0, 126], hex: '#E6007E' },
+    { code: 'Pantone 707 C', category: 'Pink', lab: [83.5, 23.0, 4.2], rgb: [243, 169, 187], hex: '#F3A9BB' },
+    { code: 'Pantone 7527 C', category: 'Brown', lab: [67.1, 8.1, 15.6], rgb: [214, 189, 161], hex: '#D6BDA1' },
+    { code: 'Pantone 7583 C', category: 'Brown', lab: [40.1, 28.4, 34.2], rgb: [155, 85, 43], hex: '#9B552B' },
+    { code: 'Pantone 476 C', category: 'Brown', lab: [22.6, 13.7, 15.5], rgb: [77, 44, 38], hex: '#4D2C26' },
+    { code: 'Pantone Cool Gray 1 C', category: 'Neutral', lab: [89.0, 0.0, -1.0], rgb: [217, 217, 214], hex: '#D9D9D6' },
+    { code: 'Pantone Cool Gray 7 C', category: 'Neutral', lab: [61.0, 0.0, -2.5], rgb: [151, 153, 155], hex: '#97999B' },
+    { code: 'Pantone Cool Gray 11 C', category: 'Neutral', lab: [35.0, 0.5, -1.8], rgb: [83, 86, 90], hex: '#53565A' },
+    { code: 'Pantone White C', category: 'Neutral', lab: [97.0, 0.1, -0.3], rgb: [245, 245, 245], hex: '#F5F5F5' },
+    { code: 'Pantone Black C', category: 'Neutral', lab: [12.5, 0.2, -1.2], rgb: [45, 41, 38], hex: '#2D2926' },
+    { code: 'Pantone 877 C', category: 'Metallic', lab: [63.0, -1.0, -2.0], rgb: [138, 141, 143], hex: '#8A8D8F' },
+    { code: 'Pantone 871 C', category: 'Metallic', lab: [56.0, 6.5, 31.0], rgb: [132, 117, 78], hex: '#84754E' },
+    { code: 'Pantone Transparent', category: 'Special', lab: [95.0, 0.0, 0.0], rgb: [230, 238, 245], hex: '#E6EEF5' }
+  ];
+
+  const partMeta = {
+    body: { label: '杯身 Body' },
+    lid: { label: '杯盖 Lid' },
+    base: { label: '底座 Base' },
+    handle: { label: '手柄 Handle' },
+    straw: { label: '吸管 Straw' }
+  };
+
+  const materials = [
+    { key: 'metal', name: 'Metal', zh: '金属', roughness: .20, reflect: .82, detail: '高反射 · 拉丝高光' },
+    { key: 'fabric', name: 'Fabric', zh: '布料', roughness: .78, reflect: .18, detail: '织纹 · 漫反射' },
+    { key: 'stone', name: 'Stone', zh: '石材', roughness: .72, reflect: .16, detail: '矿物颗粒 · 冷硬质感' },
+    { key: 'wood', name: 'Wood', zh: '木头', roughness: .56, reflect: .20, detail: '木纹 · 方向性纹理' },
+    { key: 'plastic', name: 'Plastic', zh: '塑料', roughness: .38, reflect: .42, detail: '均匀壳层 · 轻镜面' },
+    { key: 'silicone', name: 'Silicone', zh: '硅胶', roughness: .52, reflect: .26, detail: '柔雾面 · 细颗粒' },
+    { key: 'ceramic', name: 'Ceramic', zh: '陶瓷', roughness: .30, reflect: .58, detail: '釉面 · 平滑高光' },
+    { key: 'fur', name: 'Fur / Plush', zh: '毛绒', roughness: .90, reflect: .10, detail: '绒感纤维 · 软光' },
+    { key: 'leather', name: 'Leather', zh: '皮革', roughness: .62, reflect: .24, detail: '压纹 · 半哑光' }
+  ];
+
+  const state = {
+    selectedPart: 'body',
+    currentMaterial: 'metal',
+    currentLight: 'cool',
+    selectedPaletteView: 'grid',
+    activeCategory: 'All',
+    search: '',
+    partColors: {
+      body: 'Pantone 186 C',
+      lid: 'Pantone Cool Gray 1 C',
+      base: 'Pantone Cool Gray 7 C',
+      handle: 'Pantone Black C',
+      straw: 'Pantone Transparent'
+    }
+  };
+
+  const els = {
+    paletteGrid: document.getElementById('paletteGrid'),
+    spectrumView: document.getElementById('spectrumView'),
+    categoryBar: document.getElementById('categoryBar'),
+    searchInput: document.getElementById('searchInput'),
+    currentPartLabelTop: document.getElementById('currentPartLabelTop'),
+    currentPartLabelBottom: document.getElementById('currentPartLabelBottom'),
+    currentPantoneLabelTop: document.getElementById('currentPantoneLabelTop'),
+    currentPantoneLabelBottom: document.getElementById('currentPantoneLabelBottom'),
+    currentMaterialLabel: document.getElementById('currentMaterialLabel'),
+    partSwitcher: document.getElementById('partSwitcher'),
+    materialGrid: document.getElementById('materialGrid'),
+    bestMatchBox: document.getElementById('bestMatchBox'),
+    top3List: document.getElementById('top3List'),
+    labL: document.getElementById('labL'),
+    labA: document.getElementById('labA'),
+    labB: document.getElementById('labB'),
+    paramsRow: document.getElementById('paramsRow'),
+    gradientBoard: document.getElementById('gradientBoard'),
+    schemeList: document.getElementById('schemeList'),
+    jsonOutput: document.getElementById('jsonOutput'),
+    splitCompare: document.getElementById('splitCompare'),
+    toast: document.getElementById('toast')
+  };
+
+  const categories = ['All', ...new Set(pantoneData.map(item => item.category))];
+  const byCode = Object.fromEntries(pantoneData.map(item => [item.code, item]));
+
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => els.toast.classList.remove('show'), 1800);
+  }
+
+  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+  function hexToRgb(hex) {
+    const n = hex.replace('#','');
+    return [parseInt(n.slice(0,2),16), parseInt(n.slice(2,4),16), parseInt(n.slice(4,6),16)];
+  }
+  function rgbToHex(rgb) {
+    return '#' + rgb.map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2,'0')).join('').toUpperCase();
+  }
+  function mix(a, b, t) { return a + (b - a) * t; }
+  function mixRgb(rgb1, rgb2, t) { return rgb1.map((v, i) => mix(v, rgb2[i], t)); }
+  function adjustRgb(rgb, amt) {
+    return rgb.map(v => clamp(v + amt, 0, 255));
+  }
+  function mulRgb(rgb, factor) {
+    return rgb.map(v => clamp(v * factor, 0, 255));
+  }
+  function rgba(rgb, alpha=1) {
+    return `rgba(${rgb.map(v => Math.round(v)).join(',')},${alpha})`;
+  }
+
+  function getCurrentColorData(part = state.selectedPart) {
+    return byCode[state.partColors[part]] || pantoneData[0];
+  }
+
+  function renderCategories() {
+    els.categoryBar.innerHTML = '';
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'chip-btn' + (state.activeCategory === cat ? ' active' : '');
+      btn.textContent = cat;
+      btn.onclick = () => {
+        state.activeCategory = cat;
+        renderCategories();
+        renderPalette();
+      };
+      els.categoryBar.appendChild(btn);
+    });
+  }
+
+  function filteredColors() {
+    const q = state.search.trim().toLowerCase();
+    return pantoneData.filter(item => {
+      const hitCategory = state.activeCategory === 'All' || item.category === state.activeCategory;
+      const hitSearch = !q || [item.code, item.category, item.hex].join(' ').toLowerCase().includes(q);
+      return hitCategory && hitSearch;
+    });
+  }
+
+  function renderPalette() {
+    const colors = filteredColors();
+    els.paletteGrid.style.display = state.selectedPaletteView === 'grid' ? 'grid' : 'none';
+    els.spectrumView.style.display = state.selectedPaletteView === 'spectrum' ? 'grid' : 'none';
+    els.paletteGrid.innerHTML = '';
+    els.spectrumView.innerHTML = '';
+
+    colors.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'color-card' + (state.partColors[state.selectedPart] === item.code ? ' selected' : '');
+      card.innerHTML = `
+        <div class="swatch" style="background:
+          linear-gradient(135deg, rgba(255,255,255,.22), transparent 32%),
+          linear-gradient(180deg, ${adjustHex(item.hex, 12)}, ${item.hex} 46%, ${adjustHex(item.hex, -20)} 100%);"></div>
+        <div class="meta">
+          <div class="name">${item.code}</div>
+          <div class="sub">${item.category}<br>LAB: ${item.lab.map(v => v.toFixed(1)).join(', ')}<br>RGB: ${item.rgb.join(', ')}</div>
+        </div>`;
+      card.onclick = () => applyColorToSelectedPart(item.code);
+      els.paletteGrid.appendChild(card);
+    });
+
+    const grouped = {};
+    colors.forEach(c => {
+      if (!grouped[c.category]) grouped[c.category] = [];
+      grouped[c.category].push(c);
+    });
+    Object.entries(grouped).forEach(([category, items]) => {
+      const block = document.createElement('div');
+      block.innerHTML = `<div class="mini-label">${category}</div>`;
+      const strip = document.createElement('div');
+      strip.className = 'spectrum-strip';
+      const canvas = document.createElement('canvas');
+      canvas.width = 540;
+      canvas.height = 48;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+      items.forEach((item, i) => grad.addColorStop(i / Math.max(items.length - 1, 1), item.hex));
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < items.length; i++) {
+        const x = (i + 0.5) * canvas.width / items.length;
+        ctx.fillStyle = 'rgba(255,255,255,.35)';
+        ctx.fillRect(x, 0, 1, canvas.height);
+      }
+      strip.appendChild(canvas);
+      strip.onclick = e => {
+        const rect = strip.getBoundingClientRect();
+        const ratio = clamp((e.clientX - rect.left) / rect.width, 0, 0.999999);
+        const idx = Math.floor(ratio * items.length);
+        applyColorToSelectedPart(items[idx].code);
+      };
+      block.appendChild(strip);
+      els.spectrumView.appendChild(block);
+    });
+  }
+
+  function renderPartSwitcher() {
+    els.partSwitcher.innerHTML = '';
+    Object.entries(partMeta).forEach(([key, meta]) => {
+      const btn = document.createElement('button');
+      btn.className = 'part-btn' + (state.selectedPart === key ? ' active' : '');
+      btn.textContent = meta.label;
+      btn.onclick = () => selectPart(key);
+      els.partSwitcher.appendChild(btn);
+    });
+  }
+
+  function renderMaterials() {
+    els.materialGrid.innerHTML = '';
+    materials.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'material-btn' + (state.currentMaterial === item.key ? ' active' : '');
+      btn.innerHTML = `${item.zh} / ${item.name}<small>${item.detail}</small>`;
+      btn.onclick = () => {
+        state.currentMaterial = item.key;
+        renderMaterials();
+        updatePatterns();
+        updateLabels();
+        renderSplitCompare();
+      };
+      els.materialGrid.appendChild(btn);
+    });
+  }
+
+  function selectPart(key) {
+    state.selectedPart = key;
+    highlightSelectedPart();
+    renderPartSwitcher();
+    renderPalette();
+    updateLabels();
+    renderParams();
+  }
+
+  function applyColorToSelectedPart(code) {
+    state.partColors[state.selectedPart] = code;
+    updatePatterns();
+    renderPalette();
+    updateLabels();
+    renderParams();
+    renderScheme();
+    renderSplitCompare();
+  }
+
+  function updateLabels() {
+    const partLabel = partMeta[state.selectedPart].label;
+    const pantoneLabel = state.partColors[state.selectedPart];
+    els.currentPartLabelTop.textContent = partLabel;
+    els.currentPartLabelBottom.textContent = partLabel;
+    els.currentPantoneLabelTop.textContent = pantoneLabel;
+    els.currentPantoneLabelBottom.textContent = pantoneLabel;
+    const material = materials.find(m => m.key === state.currentMaterial);
+    els.currentMaterialLabel.textContent = material ? material.name : state.currentMaterial;
+  }
+
+  function highlightSelectedPart() {
+    document.querySelectorAll('.cup-part').forEach(el => {
+      el.classList.toggle('selected', el.dataset.part === state.selectedPart);
+    });
+  }
+
+  function bindCupClicks() {
+    document.querySelectorAll('.cup-part').forEach(el => {
+      el.addEventListener('click', () => selectPart(el.dataset.part));
+    });
+  }
+
+  function patternMarkup(dataUrl, key) {
+    return `<image href="${dataUrl}" x="0" y="0" width="120" height="120" preserveAspectRatio="none"></image>`;
+  }
+
+  function adjustHex(hex, amt) { return rgbToHex(adjustRgb(hexToRgb(hex), amt)); }
+
+  function getLightingConfig() {
+    return state.currentLight === 'warm'
+      ? { temp: [255, 233, 206], tint: 0.12, shadow: .92 }
+      : { temp: [214, 233, 255], tint: -0.06, shadow: .98 };
+  }
+
+  function createTextureDataUrl(baseHex, materialKey, lightKey, opacityFactor = 1) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 120; canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+    const rgb = hexToRgb(baseHex);
+    const material = materials.find(m => m.key === materialKey);
+    const light = getLightingConfig();
+
+    const highlightBase = mixRgb(rgb, light.temp, state.currentLight === 'warm' ? 0.26 : 0.18);
+    const darkBase = mulRgb(rgb, light.shadow * .82);
+
+    const bgGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    bgGrad.addColorStop(0, rgba(mixRgb(highlightBase, [255,255,255], .08), opacityFactor));
+    bgGrad.addColorStop(.35, rgba(rgb, opacityFactor));
+    bgGrad.addColorStop(1, rgba(darkBase, opacityFactor));
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    switch(materialKey) {
+      case 'metal':
+        for (let x = 0; x < canvas.width; x += 3) {
+          const a = (Math.sin(x * 0.22) + 1) / 2;
+          ctx.fillStyle = `rgba(255,255,255,${0.04 + a * 0.10})`;
+          ctx.fillRect(x, 0, 1.5, canvas.height);
+        }
+        const metalGrad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        metalGrad.addColorStop(.0, 'rgba(255,255,255,.02)');
+        metalGrad.addColorStop(.20, 'rgba(255,255,255,.14)');
+        metalGrad.addColorStop(.46, 'rgba(255,255,255,.32)');
+        metalGrad.addColorStop(.64, 'rgba(0,0,0,.06)');
+        metalGrad.addColorStop(1, 'rgba(255,255,255,.04)');
+        ctx.fillStyle = metalGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        break;
+      case 'fabric':
+        ctx.globalAlpha = .22;
+        for (let i = -canvas.height; i < canvas.width; i += 10) {
+          ctx.strokeStyle = 'rgba(255,255,255,.22)';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i + canvas.height, canvas.height); ctx.stroke();
+        }
+        for (let i = 0; i < canvas.width + canvas.height; i += 10) {
+          ctx.strokeStyle = 'rgba(0,0,0,.16)';
+          ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i - canvas.height, canvas.height); ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+        break;
+      case 'stone':
+        for (let i = 0; i < 420; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const r = Math.random() * 2.6 + 0.4;
+          ctx.fillStyle = Math.random() > .5 ? 'rgba(255,255,255,.10)' : 'rgba(0,0,0,.10)';
+          ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+        }
+        break;
+      case 'wood':
+        for (let y = 0; y < canvas.height; y += 3) {
+          const wobble = Math.sin(y * .18) * 6 + Math.sin(y * .05) * 3;
+          ctx.strokeStyle = `rgba(0,0,0,${0.04 + ((y % 12)/12)*0.06})`;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(0, y + wobble);
+          ctx.bezierCurveTo(canvas.width * .3, y - 4 + wobble, canvas.width * .7, y + 4 + wobble, canvas.width, y + wobble);
+          ctx.stroke();
+        }
+        break;
+      case 'plastic':
+        const plasticGrad = ctx.createRadialGradient(35, 22, 6, 60, 60, 88);
+        plasticGrad.addColorStop(0, 'rgba(255,255,255,.30)');
+        plasticGrad.addColorStop(.24, 'rgba(255,255,255,.14)');
+        plasticGrad.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = plasticGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < 180; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          ctx.fillStyle = 'rgba(255,255,255,.03)';
+          ctx.fillRect(x, y, 1, 1);
+        }
+        break;
+      case 'silicone':
+        for (let i = 0; i < 550; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const a = Math.random() * .08 + .03;
+          ctx.fillStyle = `rgba(255,255,255,${a})`;
+          ctx.fillRect(x, y, 1.4, 1.4);
+        }
+        break;
+      case 'ceramic':
+        const cerGrad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        cerGrad.addColorStop(.0, 'rgba(255,255,255,.05)');
+        cerGrad.addColorStop(.16, 'rgba(255,255,255,.26)');
+        cerGrad.addColorStop(.30, 'rgba(255,255,255,.06)');
+        cerGrad.addColorStop(.55, 'rgba(255,255,255,.14)');
+        cerGrad.addColorStop(1, 'rgba(0,0,0,.04)');
+        ctx.fillStyle = cerGrad;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        break;
+      case 'fur':
+        for (let i = 0; i < 780; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const len = Math.random() * 8 + 3;
+          const angle = (-50 + Math.random() * 100) * Math.PI / 180;
+          ctx.strokeStyle = Math.random() > .5 ? 'rgba(255,255,255,.14)' : 'rgba(0,0,0,.10)';
+          ctx.lineWidth = Math.random() * 1.1 + .35;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.cos(angle) * len, y + Math.sin(angle) * len);
+          ctx.stroke();
+        }
+        break;
+      case 'leather':
+        for (let i = 0; i < 260; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          const w = Math.random() * 12 + 4;
+          const h = Math.random() * 8 + 3;
+          ctx.strokeStyle = Math.random() > .5 ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.10)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.ellipse(x, y, w, h, Math.random() * Math.PI, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        break;
+    }
+
+    const lightGrad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    if (state.currentLight === 'warm') {
+      lightGrad.addColorStop(0, 'rgba(255,190,120,.10)');
+      lightGrad.addColorStop(.45, 'rgba(255,255,255,0)');
+      lightGrad.addColorStop(1, 'rgba(0,0,0,.10)');
+    } else {
+      lightGrad.addColorStop(0, 'rgba(160,205,255,.10)');
+      lightGrad.addColorStop(.45, 'rgba(255,255,255,0)');
+      lightGrad.addColorStop(1, 'rgba(0,0,0,.08)');
+    }
+    ctx.fillStyle = lightGrad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    return canvas.toDataURL('image/png');
+  }
+
+  function updatePatterns() {
+    Object.keys(partMeta).forEach(part => {
+      const pantone = byCode[state.partColors[part]];
+      const pattern = document.getElementById(`pattern_${part}`);
+      const opacity = part === 'straw' && pantone.code === 'Pantone Transparent' ? 0.74 : 1;
+      pattern.innerHTML = patternMarkup(createTextureDataUrl(pantone.hex, state.currentMaterial, state.currentLight, opacity), part);
+    });
+  }
+
+  function renderParams() {
+    const item = getCurrentColorData();
+    els.paramsRow.innerHTML = '';
+    const rows = [
+      ['Pantone', item.code],
+      ['LAB', item.lab.map(v => v.toFixed(1)).join(', ')],
+      ['RGB', item.rgb.join(', ')],
+      ['HEX', item.hex]
+    ];
+    rows.forEach(([k,v]) => {
+      const card = document.createElement('div');
+      card.className = 'param-card';
+      card.innerHTML = `<div class="k">${k}</div><div class="v"><span>${v}</span><button class="ghost-btn" data-copy="${v}">复制</button></div>`;
+      els.paramsRow.appendChild(card);
+    });
+    els.paramsRow.querySelectorAll('[data-copy]').forEach(btn => btn.onclick = () => copyText(btn.dataset.copy, `${btn.dataset.copy} 已复制`));
+    renderGradientBoard(item.hex);
+  }
+
+  function renderGradientBoard(baseHex) {
+    els.gradientBoard.innerHTML = '';
+    const rgb = hexToRgb(baseHex);
+    const steps = [-32, -16, 0, 16, 34];
+    steps.forEach((step, idx) => {
+      const hex = rgbToHex(adjustRgb(rgb, step));
+      const div = document.createElement('div');
+      div.className = 'gradient-swatch';
+      div.style.background = `linear-gradient(180deg, ${adjustHex(hex, 20)}, ${hex} 46%, ${adjustHex(hex, -18)})`;
+      div.innerHTML = `<span>${idx + 1}</span>`;
+      els.gradientBoard.appendChild(div);
+    });
+  }
+
+  function renderScheme() {
+    els.schemeList.innerHTML = '';
+    const out = {};
+    Object.keys(partMeta).forEach(key => {
+      const code = state.partColors[key];
+      out[key] = code;
+      const row = document.createElement('div');
+      row.className = 'scheme-item';
+      row.innerHTML = `<div class="left">${partMeta[key].label}</div><div class="right">${code}</div>`;
+      els.schemeList.appendChild(row);
+    });
+    els.jsonOutput.value = JSON.stringify(out, null, 2);
+  }
+
+  function renderSplitCompare() {
+    const current = getCurrentColorData().hex;
+    const keys = ['metal', 'ceramic', 'leather'];
+    els.splitCompare.innerHTML = '';
+    keys.forEach(key => {
+      const mat = materials.find(m => m.key === key);
+      const box = document.createElement('div');
+      box.className = 'mini-material';
+      const canvas = document.createElement('canvas');
+      canvas.width = 180; canvas.height = 44;
+      box.innerHTML = `<div class="mini-label">${mat.zh}</div>`;
+      box.appendChild(canvas);
+      els.splitCompare.appendChild(box);
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = createTextureDataUrl(current, key, state.currentLight, 1);
+    });
+  }
+
+  function copyText(text, msg='已复制') {
+    navigator.clipboard.writeText(text).then(() => showToast(msg)).catch(() => showToast('复制失败，请手动复制'));
+  }
+
+  function deltaE76(lab1, lab2) {
+    return Math.sqrt(
+      Math.pow(lab1[0] - lab2[0], 2) +
+      Math.pow(lab1[1] - lab2[1], 2) +
+      Math.pow(lab1[2] - lab2[2], 2)
+    );
+  }
+
+  function similarityFromDeltaE(de) {
+    return clamp(100 - (de / 2.2), 0, 100);
+  }
+
+  function runLabMatch() {
+    const L = parseFloat(els.labL.value);
+    const a = parseFloat(els.labA.value);
+    const b = parseFloat(els.labB.value);
+    if ([L,a,b].some(v => Number.isNaN(v))) {
+      showToast('请完整输入 L / a / b');
+      return;
+    }
+    const target = [L,a,b];
+    const ranked = pantoneData
+      .filter(item => item.code !== 'Pantone Transparent')
+      .map(item => ({ ...item, deltaE: deltaE76(target, item.lab) }))
+      .sort((x,y) => x.deltaE - y.deltaE)
+      .slice(0, 3);
+
+    const best = ranked[0];
+    const sim = similarityFromDeltaE(best.deltaE);
+    els.bestMatchBox.innerHTML = `
+      <strong>${best.code}</strong>
+      <div class="score">相似度：${sim.toFixed(1)}%</div>
+      <div class="delta">ΔE：${best.deltaE.toFixed(2)} ｜ LAB: ${best.lab.map(v => v.toFixed(1)).join(', ')}</div>`;
+
+    els.top3List.innerHTML = '';
+    ranked.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'top3-item';
+      row.innerHTML = `
+        <div class="dot" style="background:${item.hex}"></div>
+        <div class="top3-meta">
+          <div class="line1">Top ${idx+1} · ${item.code}</div>
+          <div class="line2">ΔE ${item.deltaE.toFixed(2)} · 相似度 ${similarityFromDeltaE(item.deltaE).toFixed(1)}%</div>
+        </div>
+        <button class="ghost-btn">应用</button>`;
+      row.querySelector('button').onclick = () => applyColorToSelectedPart(item.code);
+      els.top3List.appendChild(row);
+    });
+  }
+
+  function fillCurrentLab() {
+    const item = getCurrentColorData();
+    [els.labL.value, els.labA.value, els.labB.value] = item.lab.map(v => v.toFixed(1));
+    runLabMatch();
+  }
+
+  function bindEvents() {
+    els.searchInput.addEventListener('input', e => {
+      state.search = e.target.value;
+      renderPalette();
+    });
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.selectedPaletteView = btn.dataset.view;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b === btn));
+        renderPalette();
+      });
+    });
+
+    document.querySelectorAll('.light-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.currentLight = btn.dataset.light;
+        document.querySelectorAll('.light-btn').forEach(b => b.classList.toggle('active', b === btn));
+        updatePatterns();
+        renderSplitCompare();
+      });
+    });
+
+    document.getElementById('matchBtn').onclick = runLabMatch;
+    document.getElementById('fillCurrentLabBtn').onclick = fillCurrentLab;
+    document.getElementById('copyParamsBtn').onclick = () => {
+      const item = getCurrentColorData();
+      copyText(`Pantone: ${item.code}\nLAB: ${item.lab.join(', ')}\nRGB: ${item.rgb.join(', ')}\nHEX: ${item.hex}`, '参数已复制');
+    };
+    document.getElementById('copySchemeBtn').onclick = () => {
+      const schemeText = Object.keys(partMeta).map(key => `${partMeta[key].label}：${state.partColors[key]}`).join('\n');
+      copyText(schemeText, '配色方案已复制');
+    };
+    document.getElementById('exportJsonBtn').onclick = () => {
+      const blob = new Blob([els.jsonOutput.value], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'pantone_scheme.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('JSON 已导出');
+    };
+    document.getElementById('resetSchemeBtn').onclick = () => {
+      state.partColors = {
+        body: 'Pantone 186 C',
+        lid: 'Pantone Cool Gray 1 C',
+        base: 'Pantone Cool Gray 7 C',
+        handle: 'Pantone Black C',
+        straw: 'Pantone Transparent'
+      };
+      state.selectedPart = 'body';
+      updatePatterns();
+      renderPalette();
+      renderPartSwitcher();
+      highlightSelectedPart();
+      updateLabels();
+      renderParams();
+      renderScheme();
+      renderSplitCompare();
+      showToast('已重置为默认方案');
+    };
+  }
+
+  function init() {
+    renderCategories();
+    renderPalette();
+    renderPartSwitcher();
+    renderMaterials();
+    bindCupClicks();
+    highlightSelectedPart();
+    updateLabels();
+    updatePatterns();
+    renderParams();
+    renderScheme();
+    renderSplitCompare();
+    bindEvents();
+    fillCurrentLab();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
